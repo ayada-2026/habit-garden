@@ -181,7 +181,7 @@ function addHabit({ emoji, name, note, color }) {
 }
 
 function toggleHabitToday(id) {
-  activeHabitId = id;
+  activeHabitId = null;
   const todayKey = getDateKey();
   habits = habits.map((habit) => {
     if (habit.id !== id) return habit;

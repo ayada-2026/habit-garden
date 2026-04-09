@@ -1,0 +1,21 @@
+{
+  "name": "작은 습관 정원",
+  "short_name": "습관 정원",
+  "description": "작은 습관을 한 장씩 돌보며 키워가는 감성 습관 앱",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f5eddc",
+  "theme_color": "#f5eddc",
+  "icons": [
+    {
+      "src": "./assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
