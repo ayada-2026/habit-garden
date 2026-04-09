@@ -1,22 +1,27 @@
 const STORAGE_KEY = "habitGardenStateV2";
 
 const PALETTES = {
-  sunset: "tone-sunset",
   mint: "tone-mint",
+  sunset: "tone-sunset",
   citrus: "tone-citrus",
   berry: "tone-berry",
 };
 
 const KOREAN_DAYS = ["일", "월", "화", "수", "목", "금", "토"];
-const SHORT_DAYS = ["월", "화", "수", "목", "금", "토", "일"];
+const WEEK_LABELS = ["월", "화", "수", "목", "금", "토", "일"];
 
 const habitForm = document.querySelector("#habitForm");
 const habitEmojiInput = document.querySelector("#habitEmoji");
 const habitNameInput = document.querySelector("#habitName");
 const habitNoteInput = document.querySelector("#habitNote");
 const habitColorInput = document.querySelector("#habitColor");
-const habitList = document.querySelector("#habitList");
+const habitTrack = document.querySelector("#habitTrack");
 const emptyState = document.querySelector("#emptyState");
+const carouselFooter = document.querySelector(".carousel-footer");
+const carouselCount = document.querySelector("#carouselCount");
+const pageDots = document.querySelector("#pageDots");
+const prevHabitButton = document.querySelector("#prevHabit");
+const nextHabitButton = document.querySelector("#nextHabit");
 const todayLabel = document.querySelector("#todayLabel");
 const activeCount = document.querySelector("#activeCount");
 const doneTodayCount = document.querySelector("#doneTodayCount");
@@ -28,6 +33,9 @@ const weekOverview = document.querySelector("#weekOverview");
 const presetButtons = Array.from(document.querySelectorAll(".preset-chip"));
 
 let habits = loadHabits();
+let currentIndex = 0;
+let activeHabitId = null;
+let scrollFrame = null;
 
 function loadHabits() {
   try {
@@ -117,6 +125,7 @@ function getCurrentStreak(habit) {
 
   let streak = 0;
   let pointer = new Date();
+
   while (true) {
     const pointerKey = getDateKey(pointer);
     if (!isHabitDoneOn(habit, pointerKey)) {
@@ -141,13 +150,6 @@ function getWeeklyCount(habit, weekDates = getWeekDates()) {
   return weekDates.reduce((count, date) => count + Number(isHabitDoneOn(habit, getDateKey(date))), 0);
 }
 
-function getLastDoneText(habit) {
-  if (!habit.history.length) return "아직 체크 전";
-  const lastDateKey = habit.history[habit.history.length - 1];
-  if (lastDateKey === getDateKey()) return "오늘 체크 완료";
-  return `${formatShortDate(lastDateKey)} 마지막 체크`;
-}
-
 function addHabit({ emoji, name, note, color }) {
   const nextHabit = normalizeHabit({
     id: `${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
@@ -162,10 +164,12 @@ function addHabit({ emoji, name, note, color }) {
   if (!nextHabit.name) return;
 
   habits = [nextHabit, ...habits];
+  activeHabitId = nextHabit.id;
   saveHabits();
 }
 
 function toggleHabitToday(id) {
+  activeHabitId = id;
   const todayKey = getDateKey();
   habits = habits.map((habit) => {
     if (habit.id !== id) return habit;
@@ -182,7 +186,19 @@ function toggleHabitToday(id) {
 }
 
 function deleteHabit(id) {
+  const visibleHabits = getSortedHabits(habits);
+  const deletedIndex = visibleHabits.findIndex((habit) => habit.id === id);
   habits = habits.filter((habit) => habit.id !== id);
+
+  if (!habits.length) {
+    activeHabitId = null;
+    currentIndex = 0;
+  } else {
+    const nextVisibleHabits = getSortedHabits(habits);
+    const safeIndex = Math.min(deletedIndex, nextVisibleHabits.length - 1);
+    activeHabitId = nextVisibleHabits[safeIndex]?.id ?? nextVisibleHabits[0].id;
+  }
+
   saveHabits();
 }
 
@@ -207,28 +223,38 @@ function getInsight(summary) {
   if (summary.totalHabits === 0) {
     return {
       title: "씨앗을 심어볼 시간이에요",
-      text: "오늘 반복하고 싶은 행동 하나부터 시작해보세요.",
+      text: "첫 습관 하나만 적어도 오늘의 정원이 바로 시작돼요.",
     };
   }
 
   if (summary.doneToday === summary.totalHabits) {
     return {
       title: "오늘 정원을 모두 돌봤어요",
-      text: "지금 리듬을 이어가면 작은 반복이 금방 눈에 보이기 시작해요.",
+      text: "가볍게 이어온 체크가 하루의 리듬을 만들어주고 있어요.",
     };
   }
 
   if (summary.doneToday === 0) {
     return {
-      title: "오늘의 첫 체크를 기다리고 있어요",
-      text: "가장 쉬운 습관 하나만 먼저 완료해도 흐름이 금방 살아나요.",
+      title: "오늘의 첫 물주기를 기다리고 있어요",
+      text: "가장 쉬운 습관 하나부터 체크하면 리듬이 금방 살아나요.",
     };
   }
 
   return {
-    title: "좋은 리듬이 만들어지고 있어요",
-    text: `오늘 ${summary.doneToday}개를 체크했어요. 남은 습관도 가볍게 이어가보세요.`,
+    title: "좋은 흐름이 이어지고 있어요",
+    text: `오늘 ${summary.doneToday}개를 완료했어요. 남은 카드도 천천히 넘겨보세요.`,
   };
+}
+
+function getSortedHabits(list) {
+  const todayKey = getDateKey();
+  return [...list].sort((left, right) => {
+    const leftDone = isHabitDoneOn(left, todayKey);
+    const rightDone = isHabitDoneOn(right, todayKey);
+    if (leftDone !== rightDone) return Number(leftDone) - Number(rightDone);
+    return right.createdAt.localeCompare(left.createdAt);
+  });
 }
 
 function renderSummary(summary) {
@@ -251,39 +277,36 @@ function renderWeekOverview(list, weekDates = getWeekDates()) {
     const total = list.length;
     const isFuture = dateKey > getDateKey();
     const ratio = total > 0 ? Math.round((completed / total) * 100) : 0;
+    const ratioLabel = isFuture ? "예정" : total === 0 ? "-" : `${completed}/${total}`;
+    const caption = isFuture ? "기록 전" : total === 0 ? "습관 없음" : `${ratio}%`;
 
     const item = document.createElement("li");
     item.className = "week-pill";
-
-    const ratioLabel = isFuture ? "예정" : total === 0 ? "-" : `${completed}/${total}`;
-    const caption = isFuture ? "기록 전" : total === 0 ? "습관 없음" : `${ratio}%`;
-    const fillWidth = isFuture || total === 0 ? 0 : ratio;
-
     item.innerHTML = `
-      <span class="week-day">${SHORT_DAYS[index]}</span>
+      <span class="week-day">${WEEK_LABELS[index]}</span>
       <span class="week-ratio">${ratioLabel}</span>
-      <span class="week-track"><span class="week-fill" style="width:${fillWidth}%"></span></span>
+      <span class="week-track"><span class="week-fill" style="width:${isFuture || total === 0 ? 0 : ratio}%"></span></span>
       <span class="week-caption">${caption}</span>
     `;
-
     weekOverview.appendChild(item);
   });
 }
 
-function createMiniWeek(habit, weekDates = getWeekDates()) {
+function createHabitWeek(habit, weekDates = getWeekDates()) {
   const container = document.createElement("div");
-  container.className = "mini-week";
+  container.className = "habit-week";
 
   weekDates.forEach((date, index) => {
     const dateKey = getDateKey(date);
-    const item = document.createElement("div");
     const isFuture = dateKey > getDateKey();
+    const isToday = dateKey === getDateKey();
     const isDone = isHabitDoneOn(habit, dateKey);
 
-    item.className = `mini-day${isDone ? " is-done" : ""}${isFuture ? " is-future" : ""}`;
+    const item = document.createElement("div");
+    item.className = `habit-day${isDone ? " is-done" : ""}${isFuture ? " is-future" : ""}${isToday ? " is-today" : ""}`;
     item.innerHTML = `
-      <span class="mini-label">${SHORT_DAYS[index]}</span>
-      <span class="mini-dot"></span>
+      <span class="habit-day-label">${WEEK_LABELS[index]}</span>
+      <span class="habit-day-dot"></span>
     `;
     container.appendChild(item);
   });
@@ -291,91 +314,152 @@ function createMiniWeek(habit, weekDates = getWeekDates()) {
   return container;
 }
 
-function createHabitCard(habit, weekDates = getWeekDates()) {
-  const item = document.createElement("li");
-  item.className = `habit-item ${PALETTES[habit.color] || PALETTES.mint}`;
+function createHabitSlide(habit, weekDates = getWeekDates()) {
+  const slide = document.createElement("article");
+  slide.className = "habit-slide";
+  slide.dataset.id = habit.id;
 
   const streak = getCurrentStreak(habit);
   const weeklyCount = getWeeklyCount(habit, weekDates);
   const todayDone = isHabitDoneOn(habit, getDateKey());
-  const note = habit.note ? habit.note : "아직 메모가 없어요. 왜 이 습관을 이어가고 싶은지 적어보세요.";
-  const statusText = todayDone ? "오늘 체크가 반영됐어요." : "오늘 아직 체크 전이에요.";
+  const note = habit.note || "작게 시작해도 충분해요.";
+
+  const panel = document.createElement("section");
+  panel.className = `habit-panel ${PALETTES[habit.color] || PALETTES.mint}`;
 
   const top = document.createElement("div");
-  top.className = "habit-top";
+  top.className = "habit-panel-top";
   top.innerHTML = `
-    <div class="habit-title">
-      <div class="habit-icon">${habit.emoji}</div>
-      <div class="habit-name-wrap">
-        <h3>${escapeHtml(habit.name)}</h3>
-        <p class="habit-note">${escapeHtml(note)}</p>
+    <div class="habit-icon">${habit.emoji}</div>
+    <details class="habit-menu">
+      <summary aria-label="습관 메뉴">⋯</summary>
+      <div class="habit-menu-popover">
+        <button type="button" class="menu-button">이 습관 삭제</button>
       </div>
-    </div>
-    <span class="streak-badge">${streak}일 연속</span>
+    </details>
   `;
 
-  const meta = document.createElement("div");
-  meta.className = "habit-meta";
-  meta.innerHTML = `
-    <span>이번 주 ${weeklyCount}회 체크</span>
-    <span>${escapeHtml(getLastDoneText(habit))}</span>
+  const title = document.createElement("div");
+  title.className = "habit-copy";
+  title.innerHTML = `
+    <h3 class="habit-title">${escapeHtml(habit.name)}</h3>
+    <p class="habit-description">${escapeHtml(note)}</p>
   `;
 
-  const week = createMiniWeek(habit, weekDates);
-
-  const status = document.createElement("div");
-  status.className = "habit-status";
-  status.innerHTML = `
-    <span>${escapeHtml(statusText)}</span>
+  const stats = document.createElement("div");
+  stats.className = "habit-stats";
+  stats.innerHTML = `
+    <span class="stat-badge">${streak}일 연속</span>
+    <span class="stat-pill">이번 주 ${weeklyCount}/7</span>
   `;
 
-  const actions = document.createElement("div");
-  actions.className = "habit-actions";
+  const week = createHabitWeek(habit, weekDates);
 
-  const toggleButton = document.createElement("button");
-  toggleButton.type = "button";
-  toggleButton.className = todayDone ? "secondary-button" : "primary-button";
-  toggleButton.textContent = todayDone ? "체크 취소" : "오늘 완료";
-  toggleButton.addEventListener("click", () => {
+  const action = document.createElement("button");
+  action.type = "button";
+  action.className = `habit-main-action${todayDone ? " is-complete" : ""}`;
+  action.textContent = todayDone ? "체크 취소" : "오늘 완료";
+  action.addEventListener("click", () => {
     toggleHabitToday(habit.id);
     render();
   });
 
-  const deleteButton = document.createElement("button");
-  deleteButton.type = "button";
-  deleteButton.className = "ghost-button";
-  deleteButton.textContent = "삭제";
+  const deleteButton = top.querySelector(".menu-button");
   deleteButton.addEventListener("click", () => {
+    const shouldDelete = window.confirm(`"${habit.name}" 습관을 삭제할까요?`);
+    if (!shouldDelete) return;
     deleteHabit(habit.id);
     render();
   });
 
-  actions.append(toggleButton, deleteButton);
-  item.append(top, meta, week, status, actions);
-  return item;
+  panel.append(top, title, stats, week, action);
+  slide.appendChild(panel);
+  return slide;
 }
 
-function renderHabits(list, weekDates = getWeekDates()) {
-  habitList.innerHTML = "";
+function renderHabitCarousel(list, weekDates = getWeekDates()) {
+  habitTrack.innerHTML = "";
+  pageDots.innerHTML = "";
 
   if (!list.length) {
     emptyState.classList.remove("is-hidden");
+    habitTrack.classList.add("is-hidden");
+    carouselFooter.classList.add("is-hidden");
+    carouselCount.textContent = "0 / 0";
     return;
   }
 
   emptyState.classList.add("is-hidden");
+  habitTrack.classList.remove("is-hidden");
+  carouselFooter.classList.remove("is-hidden");
 
-  const todayKey = getDateKey();
-  const sorted = [...list].sort((left, right) => {
-    const leftDone = isHabitDoneOn(left, todayKey);
-    const rightDone = isHabitDoneOn(right, todayKey);
-    if (leftDone !== rightDone) return Number(leftDone) - Number(rightDone);
-    return right.createdAt.localeCompare(left.createdAt);
+  const sorted = getSortedHabits(list);
+  const activeIndexFromId = activeHabitId ? sorted.findIndex((habit) => habit.id === activeHabitId) : -1;
+  currentIndex = activeIndexFromId >= 0 ? activeIndexFromId : Math.min(currentIndex, sorted.length - 1);
+  activeHabitId = sorted[currentIndex]?.id ?? sorted[0].id;
+
+  sorted.forEach((habit, index) => {
+    habitTrack.appendChild(createHabitSlide(habit, weekDates));
+
+    const dot = document.createElement("button");
+    dot.type = "button";
+    dot.className = `page-dot${index === currentIndex ? " is-active" : ""}`;
+    dot.setAttribute("aria-label", `${index + 1}번째 습관으로 이동`);
+    dot.addEventListener("click", () => scrollToHabit(index));
+    pageDots.appendChild(dot);
   });
 
-  sorted.forEach((habit) => {
-    habitList.appendChild(createHabitCard(habit, weekDates));
+  syncCarouselMeta(sorted.length);
+
+  requestAnimationFrame(() => {
+    scrollToHabit(currentIndex, "auto");
   });
+}
+
+function scrollToHabit(index, behavior = "smooth") {
+  const slides = Array.from(habitTrack.children);
+  const nextSlide = slides[index];
+  if (!nextSlide) return;
+
+  const targetLeft = nextSlide.offsetLeft - (habitTrack.clientWidth - nextSlide.clientWidth) / 2;
+  habitTrack.scrollTo({ left: targetLeft, behavior });
+  currentIndex = index;
+  activeHabitId = nextSlide.dataset.id || activeHabitId;
+  syncCarouselMeta(slides.length);
+}
+
+function getNearestSlideIndex() {
+  const slides = Array.from(habitTrack.children);
+  if (!slides.length) return 0;
+
+  const trackRect = habitTrack.getBoundingClientRect();
+  const trackCenter = trackRect.left + trackRect.width / 2;
+
+  let nearestIndex = 0;
+  let nearestDistance = Number.POSITIVE_INFINITY;
+
+  slides.forEach((slide, index) => {
+    const rect = slide.getBoundingClientRect();
+    const slideCenter = rect.left + rect.width / 2;
+    const distance = Math.abs(trackCenter - slideCenter);
+    if (distance < nearestDistance) {
+      nearestDistance = distance;
+      nearestIndex = index;
+    }
+  });
+
+  return nearestIndex;
+}
+
+function syncCarouselMeta(totalSlides) {
+  carouselCount.textContent = `${totalSlides === 0 ? 0 : currentIndex + 1} / ${totalSlides}`;
+
+  Array.from(pageDots.children).forEach((dot, index) => {
+    dot.classList.toggle("is-active", index === currentIndex);
+  });
+
+  prevHabitButton.disabled = currentIndex <= 0;
+  nextHabitButton.disabled = currentIndex >= totalSlides - 1;
 }
 
 function renderTodayLabel() {
@@ -388,12 +472,12 @@ function render() {
   const summary = getSummary(habits, weekDates);
   renderTodayLabel();
   renderSummary(summary);
-  renderHabits(habits, weekDates);
+  renderHabitCarousel(habits, weekDates);
   renderWeekOverview(habits, weekDates);
 }
 
 function escapeHtml(value) {
-  return value
+  return String(value)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
@@ -426,6 +510,41 @@ presetButtons.forEach((button) => {
     habitColorInput.value = button.dataset.color || "mint";
     habitNameInput.focus();
     habitNameInput.setSelectionRange(habitNameInput.value.length, habitNameInput.value.length);
+  });
+});
+
+prevHabitButton.addEventListener("click", () => {
+  scrollToHabit(Math.max(0, currentIndex - 1));
+});
+
+nextHabitButton.addEventListener("click", () => {
+  const totalSlides = habitTrack.children.length;
+  scrollToHabit(Math.min(totalSlides - 1, currentIndex + 1));
+});
+
+habitTrack.addEventListener("scroll", () => {
+  if (scrollFrame) cancelAnimationFrame(scrollFrame);
+  scrollFrame = requestAnimationFrame(() => {
+    const nextIndex = getNearestSlideIndex();
+    if (nextIndex !== currentIndex) {
+      currentIndex = nextIndex;
+      activeHabitId = habitTrack.children[nextIndex]?.dataset.id || activeHabitId;
+      syncCarouselMeta(habitTrack.children.length);
+    }
+  });
+});
+
+window.addEventListener("resize", () => {
+  if (!habitTrack.children.length) return;
+  scrollToHabit(currentIndex, "auto");
+});
+
+document.addEventListener("click", (event) => {
+  const menus = Array.from(document.querySelectorAll(".habit-menu[open]"));
+  menus.forEach((menu) => {
+    if (!menu.contains(event.target)) {
+      menu.removeAttribute("open");
+    }
   });
 });
 
