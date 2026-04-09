@@ -276,16 +276,17 @@ function renderWeekOverview(list, weekDates = getWeekDates()) {
     const completed = list.filter((habit) => isHabitDoneOn(habit, dateKey)).length;
     const total = list.length;
     const isFuture = dateKey > getDateKey();
+    const isToday = dateKey === getDateKey();
     const ratio = total > 0 ? Math.round((completed / total) * 100) : 0;
     const ratioLabel = isFuture ? "예정" : total === 0 ? "-" : `${completed}/${total}`;
     const caption = isFuture ? "기록 전" : total === 0 ? "습관 없음" : `${ratio}%`;
 
     const item = document.createElement("li");
-    item.className = "week-pill";
+    item.className = `week-pill${isToday ? " is-today" : ""}${isFuture ? " is-future" : ""}`;
     item.innerHTML = `
       <span class="week-day">${WEEK_LABELS[index]}</span>
       <span class="week-ratio">${ratioLabel}</span>
-      <span class="week-track"><span class="week-fill" style="width:${isFuture || total === 0 ? 0 : ratio}%"></span></span>
+      <span class="week-track"><span class="week-fill" style="height:${isFuture || total === 0 ? 0 : ratio}%"></span></span>
       <span class="week-caption">${caption}</span>
     `;
     weekOverview.appendChild(item);

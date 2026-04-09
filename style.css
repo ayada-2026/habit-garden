@@ -250,8 +250,8 @@ select:focus {
   display: flex;
   gap: 16px;
   overflow-x: auto;
-  padding: 8px 18px 12px;
-  margin: 0 -18px;
+  padding: 8px 0 12px;
+  margin: 0;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   scrollbar-width: none;
@@ -263,14 +263,14 @@ select:focus {
 }
 
 .habit-slide {
-  flex: 0 0 88%;
+  flex: 0 0 100%;
   scroll-snap-align: center;
 }
 
 .habit-panel {
   position: relative;
-  min-height: 420px;
-  padding: 22px;
+  min-height: 468px;
+  padding: 22px 22px 24px;
   display: flex;
   flex-direction: column;
   border-radius: 30px;
@@ -280,9 +280,9 @@ select:focus {
 
 .tone-mint {
   background:
-    radial-gradient(circle at top right, rgba(244, 255, 250, 0.84), transparent 26%),
-    radial-gradient(circle at bottom left, rgba(190, 236, 219, 0.54), transparent 28%),
-    linear-gradient(180deg, #eef9f4 0%, #f9fcfa 58%, #ffffff 100%);
+    radial-gradient(circle at top right, rgba(244, 255, 250, 0.86), transparent 26%),
+    radial-gradient(circle at bottom left, rgba(186, 234, 216, 0.58), transparent 30%),
+    linear-gradient(180deg, #e7f7f1 0%, #f2faf6 42%, #ffffff 100%);
 }
 
 .tone-sunset {
@@ -314,15 +314,15 @@ select:focus {
 }
 
 .habit-icon {
-  width: 66px;
-  height: 66px;
+  width: 72px;
+  height: 72px;
   display: grid;
   place-items: center;
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.8);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.88);
   border: 1px solid rgba(255, 255, 255, 0.72);
-  font-size: 2rem;
-  box-shadow: 0 12px 18px rgba(147, 186, 170, 0.14);
+  font-size: 2.2rem;
+  box-shadow: 0 14px 22px rgba(147, 186, 170, 0.16);
 }
 
 .habit-menu {
@@ -376,18 +376,18 @@ select:focus {
 }
 
 .habit-copy {
-  margin-top: 18px;
+  margin-top: 26px;
 }
 
 .habit-title {
   margin: 0;
-  font-size: clamp(1.8rem, 5vw, 2.4rem);
+  font-size: clamp(2rem, 5vw, 2.65rem);
 }
 
 .habit-description {
-  margin: 10px 0 0;
+  margin: 12px 0 0;
   color: var(--muted);
-  font-size: 1rem;
+  font-size: 1.02rem;
   line-height: 1.55;
 }
 
@@ -395,7 +395,7 @@ select:focus {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 18px;
+  margin-top: 22px;
 }
 
 .stat-badge,
@@ -422,36 +422,38 @@ select:focus {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 8px;
-  margin-top: 22px;
+  margin-top: 26px;
 }
 
 .habit-day {
+  min-height: 74px;
   padding: 10px 0 12px;
-  border-radius: 999px;
+  border-radius: 26px;
   text-align: center;
-  background: rgba(255, 255, 255, 0.56);
+  background: rgba(255, 255, 255, 0.62);
   border: 1px solid rgba(136, 118, 92, 0.08);
 }
 
 .habit-day-label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   font-size: 0.78rem;
   color: var(--muted-soft);
 }
 
 .habit-day-dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   margin: 0 auto;
   border-radius: 999px;
   background: rgba(136, 118, 92, 0.18);
 }
 
 .habit-day.is-done .habit-day-dot {
-  width: 24px;
+  width: 10px;
+  height: 26px;
   background: linear-gradient(90deg, #8fd1b7 0%, #4b977b 100%);
-  box-shadow: 0 0 0 4px rgba(102, 173, 146, 0.12);
+  box-shadow: 0 0 0 4px rgba(102, 173, 146, 0.1);
 }
 
 .habit-day.is-future {
@@ -466,7 +468,7 @@ select:focus {
 .habit-main-action {
   width: 100%;
   margin-top: auto;
-  min-height: 58px;
+  min-height: 60px;
   border-radius: 20px;
   color: #fff;
   font-weight: 700;
@@ -636,16 +638,28 @@ select:focus {
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .week-pill {
-  padding: 12px 10px;
-  border-radius: 20px;
+  min-height: 174px;
+  padding: 14px 10px 12px;
+  border-radius: 24px;
   background: rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(136, 118, 92, 0.08);
   text-align: center;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+}
+
+.week-pill.is-today {
+  background:
+    radial-gradient(circle at top, rgba(217, 244, 233, 0.76), transparent 42%),
+    rgba(241, 252, 247, 0.98);
+  border-color: rgba(102, 173, 146, 0.22);
+  box-shadow: 0 12px 24px rgba(82, 146, 124, 0.12);
 }
 
 .week-day {
@@ -657,28 +671,35 @@ select:focus {
 .week-ratio {
   display: block;
   margin-top: 8px;
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 700;
 }
 
 .week-track {
-  width: 100%;
-  height: 6px;
-  margin-top: 10px;
+  width: 10px;
+  height: 78px;
+  margin-top: 14px;
   border-radius: 999px;
   overflow: hidden;
   background: rgba(136, 118, 92, 0.12);
+  display: flex;
+  align-items: flex-end;
 }
 
 .week-fill {
-  height: 100%;
+  width: 100%;
+  height: 0;
   border-radius: inherit;
-  background: linear-gradient(90deg, #9bd6bf 0%, #4c987d 100%);
+  background: linear-gradient(180deg, #b8e4d1 0%, #5ba489 100%);
+}
+
+.week-pill.is-today .week-fill {
+  background: linear-gradient(180deg, #9ad6be 0%, #3f866e 100%);
 }
 
 .week-caption {
   display: block;
-  margin-top: 8px;
+  margin-top: 10px;
   font-size: 0.78rem;
   color: var(--muted-soft);
 }
@@ -752,29 +773,29 @@ select:focus {
   }
 
   .habit-track {
-    padding-inline: 14px;
-    margin-inline: -14px;
+    padding-inline: 0;
+    margin-inline: 0;
   }
 
   .habit-slide {
-    flex-basis: 90%;
+    flex-basis: 100%;
   }
 
   .habit-panel {
-    min-height: 392px;
-    padding: 18px;
+    min-height: 430px;
+    padding: 20px 18px 22px;
     border-radius: 28px;
   }
 
   .habit-icon {
-    width: 58px;
-    height: 58px;
-    font-size: 1.85rem;
+    width: 64px;
+    height: 64px;
+    font-size: 2rem;
     border-radius: 20px;
   }
 
   .habit-title {
-    font-size: 2rem;
+    font-size: 2.15rem;
   }
 
   .habit-description {
@@ -802,10 +823,6 @@ select:focus {
 
   .summary-value {
     font-size: 1.65rem;
-  }
-
-  .habit-slide {
-    flex-basis: 86%;
   }
 
   .habit-title {
@@ -842,6 +859,6 @@ select:focus {
   }
 
   .week-overview {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
 }
