@@ -23,7 +23,6 @@ const pageDots = document.querySelector("#pageDots");
 const prevHabitButton = document.querySelector("#prevHabit");
 const nextHabitButton = document.querySelector("#nextHabit");
 const todayLabel = document.querySelector("#todayLabel");
-const activeCount = document.querySelector("#activeCount");
 const doneTodayCount = document.querySelector("#doneTodayCount");
 const strongestStreak = document.querySelector("#strongestStreak");
 const weeklyRate = document.querySelector("#weeklyRate");
@@ -258,7 +257,6 @@ function getSortedHabits(list) {
 }
 
 function renderSummary(summary) {
-  activeCount.textContent = `${summary.totalHabits}`;
   doneTodayCount.textContent = `${summary.doneToday}`;
   strongestStreak.textContent = `${summary.longestStreak}일`;
   weeklyRate.textContent = `${summary.weeklyPercent}%`;
@@ -351,10 +349,18 @@ function createHabitSlide(habit, weekDates = getWeekDates()) {
   stats.className = "habit-stats";
   stats.innerHTML = `
     <span class="stat-badge">${streak}일 연속</span>
-    <span class="stat-pill">이번 주 ${weeklyCount}/7</span>
+    <span class="stat-pill">이번 주 ${weeklyCount}회</span>
   `;
 
   const week = createHabitWeek(habit, weekDates);
+
+  const deleteButton = top.querySelector(".menu-button");
+  deleteButton.addEventListener("click", () => {
+    const shouldDelete = window.confirm(`"${habit.name}" 습관을 삭제할까요?`);
+    if (!shouldDelete) return;
+    deleteHabit(habit.id);
+    render();
+  });
 
   const action = document.createElement("button");
   action.type = "button";
@@ -362,14 +368,6 @@ function createHabitSlide(habit, weekDates = getWeekDates()) {
   action.textContent = todayDone ? "체크 취소" : "오늘 완료";
   action.addEventListener("click", () => {
     toggleHabitToday(habit.id);
-    render();
-  });
-
-  const deleteButton = top.querySelector(".menu-button");
-  deleteButton.addEventListener("click", () => {
-    const shouldDelete = window.confirm(`"${habit.name}" 습관을 삭제할까요?`);
-    if (!shouldDelete) return;
-    deleteHabit(habit.id);
     render();
   });
 

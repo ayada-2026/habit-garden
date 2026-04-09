@@ -179,14 +179,14 @@ select:focus {
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
   margin-top: 18px;
 }
 
 .summary-card {
-  min-height: 98px;
-  padding: 15px 16px;
+  min-height: 92px;
+  padding: 14px 15px;
   display: grid;
   align-content: space-between;
   border-radius: 20px;
@@ -488,7 +488,7 @@ select:focus {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
 .carousel-indicator {
@@ -499,8 +499,8 @@ select:focus {
 }
 
 .page-count {
-  font-size: 0.92rem;
-  color: var(--muted);
+  font-size: 0.88rem;
+  color: rgba(116, 104, 91, 0.8);
 }
 
 .page-dots {
@@ -514,12 +514,12 @@ select:focus {
   width: 9px;
   height: 9px;
   border-radius: 999px;
-  background: rgba(136, 118, 92, 0.2);
+  background: rgba(136, 118, 92, 0.14);
 }
 
 .page-dot.is-active {
-  width: 28px;
-  background: linear-gradient(90deg, #8fd1b7 0%, #4c997d 100%);
+  width: 24px;
+  background: linear-gradient(90deg, rgba(143, 209, 183, 0.9) 0%, rgba(76, 153, 125, 0.9) 100%);
 }
 
 .nav-button {
@@ -527,10 +527,10 @@ select:focus {
   min-height: 42px;
   padding: 0 14px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.84);
+  background: rgba(255, 255, 255, 0.68);
   border: 1px solid rgba(136, 118, 92, 0.08);
-  color: var(--muted);
-  box-shadow: var(--shadow-soft);
+  color: rgba(116, 104, 91, 0.78);
+  box-shadow: 0 8px 18px rgba(145, 124, 95, 0.06);
 }
 
 .nav-button:disabled {
@@ -540,7 +540,7 @@ select:focus {
 
 .habit-form {
   display: grid;
-  grid-template-columns: 108px minmax(0, 1fr) 152px;
+  grid-template-columns: minmax(0, 1fr) 96px 144px;
   gap: 12px;
   align-items: end;
 }
@@ -557,7 +557,9 @@ select:focus {
 
 .field-emoji input {
   text-align: center;
-  font-size: 1.55rem;
+  min-height: 48px;
+  padding-inline: 12px;
+  font-size: 1.2rem;
 }
 
 .form-submit,
@@ -592,14 +594,16 @@ select:focus {
   list-style: none;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  padding: 0 15px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.84);
-  border: 1px solid rgba(136, 118, 92, 0.08);
+  justify-content: flex-start;
+  min-height: 24px;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  border: 0;
   color: var(--muted);
-  box-shadow: var(--shadow-soft);
+  box-shadow: none;
+  font-size: 0.92rem;
+  font-weight: 600;
 }
 
 .detail-toggle::-webkit-details-marker {
@@ -624,13 +628,14 @@ select:focus {
 }
 
 .preset-chip {
-  min-height: 42px;
-  padding: 0 14px;
+  min-height: 34px;
+  padding: 0 11px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.84);
   border: 1px solid rgba(136, 118, 92, 0.08);
   color: var(--muted);
-  box-shadow: var(--shadow-soft);
+  box-shadow: none;
+  font-size: 0.86rem;
 }
 
 .week-overview {
@@ -814,6 +819,10 @@ select:focus {
 
 @media (max-width: 480px) {
   .summary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .summary-grid {
     gap: 10px;
   }
 
@@ -823,6 +832,18 @@ select:focus {
 
   .summary-value {
     font-size: 1.65rem;
+  }
+
+  .habit-form {
+    grid-template-columns: minmax(0, 1fr) 84px;
+  }
+
+  .field-name {
+    grid-column: 1 / -1;
+  }
+
+  .form-submit {
+    grid-column: 1 / -1;
   }
 
   .habit-title {

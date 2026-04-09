@@ -13,8 +13,8 @@
       <header class="hero">
         <div class="hero-copy">
           <p class="eyebrow">Habit Garden</p>
-          <h1 id="pageTitle">작은 반복을 키우는 습관 정원</h1>
-          <p class="hero-text">하루 한 장씩 넘기며 오늘의 습관을 가볍게 돌봐보세요.</p>
+          <h1 id="pageTitle">작은 습관 정원</h1>
+          <p class="hero-text">하루 한 장씩 넘기며 오늘의 습관을 돌봐보세요.</p>
         </div>
 
         <section class="hero-status" aria-labelledby="insightTitle">
@@ -24,10 +24,6 @@
           <p class="hero-note" id="insightText">가장 쉬운 습관 하나부터 체크하면 리듬이 금방 살아나요.</p>
 
           <div class="summary-grid" aria-label="오늘 요약">
-            <article class="summary-card">
-              <span class="summary-label">활성 습관</span>
-              <strong class="summary-value" id="activeCount">0</strong>
-            </article>
             <article class="summary-card">
               <span class="summary-label">오늘 완료</span>
               <strong class="summary-value" id="doneTodayCount">0</strong>
@@ -85,21 +81,21 @@
         </div>
 
         <form class="habit-form" id="habitForm">
-          <label class="field field-emoji">
-            <span class="field-label">아이콘</span>
-            <input id="habitEmoji" name="emoji" type="text" maxlength="2" placeholder="🌿" autocomplete="off">
-          </label>
-
           <label class="field field-name">
             <span class="field-label">습관 이름</span>
             <input id="habitName" name="name" type="text" maxlength="32" placeholder="예: 물 2리터 마시기" autocomplete="off" required>
+          </label>
+
+          <label class="field field-emoji">
+            <span class="field-label">아이콘</span>
+            <input id="habitEmoji" name="emoji" type="text" maxlength="2" placeholder="🌿" autocomplete="off">
           </label>
 
           <button type="submit" class="primary-button form-submit">습관 추가</button>
         </form>
 
         <details class="detail-panel">
-          <summary class="detail-toggle">메모와 색 더하기</summary>
+          <summary class="detail-toggle">+ 메모와 색 더하기</summary>
           <div class="detail-body">
             <div class="detail-grid">
               <label class="field">
