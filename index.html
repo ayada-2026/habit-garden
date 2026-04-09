@@ -86,10 +86,28 @@
             <input id="habitName" name="name" type="text" maxlength="32" placeholder="예: 물 2리터 마시기" autocomplete="off" required>
           </label>
 
-          <label class="field field-emoji">
+          <div class="field field-emoji">
             <span class="field-label">아이콘</span>
-            <input id="habitEmoji" name="emoji" type="text" maxlength="2" placeholder="🌿" autocomplete="off">
-          </label>
+            <details class="emoji-picker" id="emojiPicker">
+              <summary class="emoji-trigger">
+                <span class="emoji-preview" id="emojiPreview">🌿</span>
+                <span class="emoji-trigger-text">아이콘 선택</span>
+              </summary>
+              <div class="emoji-grid" aria-label="아이콘 선택 목록">
+                <button type="button" class="emoji-option" data-emoji="🌿" aria-label="새싹">🌿</button>
+                <button type="button" class="emoji-option" data-emoji="💧" aria-label="물방울">💧</button>
+                <button type="button" class="emoji-option" data-emoji="📚" aria-label="책">📚</button>
+                <button type="button" class="emoji-option" data-emoji="🧘" aria-label="명상">🧘</button>
+                <button type="button" class="emoji-option" data-emoji="🌙" aria-label="달">🌙</button>
+                <button type="button" class="emoji-option" data-emoji="🏃" aria-label="달리기">🏃</button>
+                <button type="button" class="emoji-option" data-emoji="🍎" aria-label="사과">🍎</button>
+                <button type="button" class="emoji-option" data-emoji="☀️" aria-label="해">☀️</button>
+                <button type="button" class="emoji-option" data-emoji="🧴" aria-label="로션">🧴</button>
+                <button type="button" class="emoji-option" data-emoji="🪴" aria-label="화분">🪴</button>
+              </div>
+            </details>
+            <input id="habitEmoji" name="emoji" type="hidden" value="🌿">
+          </div>
 
           <button type="submit" class="primary-button form-submit">습관 추가</button>
         </form>

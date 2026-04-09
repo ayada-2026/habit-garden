@@ -12,6 +12,9 @@ const WEEK_LABELS = ["월", "화", "수", "목", "금", "토", "일"];
 
 const habitForm = document.querySelector("#habitForm");
 const habitEmojiInput = document.querySelector("#habitEmoji");
+const emojiPicker = document.querySelector("#emojiPicker");
+const emojiPreview = document.querySelector("#emojiPreview");
+const emojiOptions = Array.from(document.querySelectorAll(".emoji-option"));
 const habitNameInput = document.querySelector("#habitName");
 const habitNoteInput = document.querySelector("#habitNote");
 const habitColorInput = document.querySelector("#habitColor");
@@ -35,6 +38,16 @@ let habits = loadHabits();
 let currentIndex = 0;
 let activeHabitId = null;
 let scrollFrame = null;
+
+function setSelectedEmoji(emoji) {
+  const nextEmoji = emoji && emoji.trim() ? emoji.trim() : "🌿";
+  habitEmojiInput.value = nextEmoji;
+  emojiPreview.textContent = nextEmoji;
+
+  emojiOptions.forEach((button) => {
+    button.classList.toggle("is-selected", button.dataset.emoji === nextEmoji);
+  });
+}
 
 function loadHabits() {
   try {
@@ -330,6 +343,17 @@ function createHabitSlide(habit, weekDates = getWeekDates()) {
   top.className = "habit-panel-top";
   top.innerHTML = `
     <div class="habit-icon">${habit.emoji}</div>
+    <div class="habit-heading">
+      <h3 class="habit-title">${escapeHtml(habit.name)}</h3>
+      <p class="habit-description">${escapeHtml(note)}</p>
+    </div>
+  `;
+
+  const stats = document.createElement("div");
+  stats.className = "habit-stats";
+  stats.innerHTML = `
+    <span class="stat-badge">${streak}일 연속</span>
+    <span class="stat-pill">이번 주 ${weeklyCount}회</span>
     <details class="habit-menu">
       <summary aria-label="습관 메뉴">⋯</summary>
       <div class="habit-menu-popover">
@@ -338,23 +362,9 @@ function createHabitSlide(habit, weekDates = getWeekDates()) {
     </details>
   `;
 
-  const title = document.createElement("div");
-  title.className = "habit-copy";
-  title.innerHTML = `
-    <h3 class="habit-title">${escapeHtml(habit.name)}</h3>
-    <p class="habit-description">${escapeHtml(note)}</p>
-  `;
-
-  const stats = document.createElement("div");
-  stats.className = "habit-stats";
-  stats.innerHTML = `
-    <span class="stat-badge">${streak}일 연속</span>
-    <span class="stat-pill">이번 주 ${weeklyCount}회</span>
-  `;
-
   const week = createHabitWeek(habit, weekDates);
 
-  const deleteButton = top.querySelector(".menu-button");
+  const deleteButton = stats.querySelector(".menu-button");
   deleteButton.addEventListener("click", () => {
     const shouldDelete = window.confirm(`"${habit.name}" 습관을 삭제할까요?`);
     if (!shouldDelete) return;
@@ -371,7 +381,7 @@ function createHabitSlide(habit, weekDates = getWeekDates()) {
     render();
   });
 
-  panel.append(top, title, stats, week, action);
+  panel.append(top, stats, week, action);
   slide.appendChild(panel);
   return slide;
 }
@@ -495,7 +505,7 @@ habitForm.addEventListener("submit", (event) => {
   });
 
   habitForm.reset();
-  habitEmojiInput.value = "🌿";
+  setSelectedEmoji("🌿");
   habitColorInput.value = "mint";
   render();
   habitNameInput.focus();
@@ -503,12 +513,19 @@ habitForm.addEventListener("submit", (event) => {
 
 presetButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    habitEmojiInput.value = button.dataset.emoji || "🌿";
+    setSelectedEmoji(button.dataset.emoji || "🌿");
     habitNameInput.value = button.dataset.name || "";
     habitNoteInput.value = button.dataset.note || "";
     habitColorInput.value = button.dataset.color || "mint";
     habitNameInput.focus();
     habitNameInput.setSelectionRange(habitNameInput.value.length, habitNameInput.value.length);
+  });
+});
+
+emojiOptions.forEach((button) => {
+  button.addEventListener("click", () => {
+    setSelectedEmoji(button.dataset.emoji || "🌿");
+    emojiPicker.removeAttribute("open");
   });
 });
 
@@ -545,8 +562,12 @@ document.addEventListener("click", (event) => {
       menu.removeAttribute("open");
     }
   });
+
+  if (emojiPicker?.hasAttribute("open") && !emojiPicker.contains(event.target)) {
+    emojiPicker.removeAttribute("open");
+  }
 });
 
-habitEmojiInput.value = habitEmojiInput.value || "🌿";
+setSelectedEmoji(habitEmojiInput.value || "🌿");
 habitColorInput.value = habitColorInput.value || "mint";
 render();
