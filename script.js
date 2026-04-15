@@ -260,13 +260,7 @@ function getInsight(summary) {
 }
 
 function getSortedHabits(list) {
-  const todayKey = getDateKey();
-  return [...list].sort((left, right) => {
-    const leftDone = isHabitDoneOn(left, todayKey);
-    const rightDone = isHabitDoneOn(right, todayKey);
-    if (leftDone !== rightDone) return Number(leftDone) - Number(rightDone);
-    return right.createdAt.localeCompare(left.createdAt);
-  });
+  return [...list];
 }
 
 function renderSummary(summary) {

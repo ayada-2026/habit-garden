@@ -106,6 +106,7 @@
                 <button type="button" class="emoji-option" data-emoji="📚" aria-label="책">📚</button>
                 <button type="button" class="emoji-option" data-emoji="🧘" aria-label="명상">🧘</button>
                 <button type="button" class="emoji-option" data-emoji="🌙" aria-label="달">🌙</button>
+                <button type="button" class="emoji-option" data-emoji="🎸" aria-label="악기">🎸</button>
                 <button type="button" class="emoji-option" data-emoji="🏃" aria-label="달리기">🏃</button>
                 <button type="button" class="emoji-option" data-emoji="🍎" aria-label="사과">🍎</button>
                 <button type="button" class="emoji-option" data-emoji="☀️" aria-label="해">☀️</button>
@@ -116,37 +117,30 @@
             <input id="habitEmoji" name="emoji" type="hidden" value="🌿">
           </div>
 
+          <details class="detail-panel">
+            <summary class="detail-toggle">+ 메모와 색 더하기</summary>
+            <div class="detail-body">
+              <div class="detail-grid">
+                <label class="field">
+                  <span class="field-label">짧은 설명</span>
+                  <input id="habitNote" name="note" type="text" maxlength="80" placeholder="왜 이 습관을 이어가고 싶은지 한 줄로 적어보세요." autocomplete="off">
+                </label>
+
+                <label class="field">
+                  <span class="field-label">분위기 색</span>
+                  <select id="habitColor" name="color">
+                    <option value="mint">민트빛</option>
+                    <option value="sunset">노을빛</option>
+                    <option value="citrus">햇살빛</option>
+                    <option value="berry">베리빛</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+          </details>
+
           <button type="submit" class="primary-button form-submit">습관 추가</button>
         </form>
-
-        <details class="detail-panel">
-          <summary class="detail-toggle">+ 메모와 색 더하기</summary>
-          <div class="detail-body">
-            <div class="detail-grid">
-              <label class="field">
-                <span class="field-label">짧은 설명</span>
-                <input id="habitNote" name="note" type="text" maxlength="80" placeholder="왜 이 습관을 이어가고 싶은지 한 줄로 적어보세요." autocomplete="off">
-              </label>
-
-              <label class="field">
-                <span class="field-label">분위기 색</span>
-                <select id="habitColor" name="color">
-                  <option value="mint">민트빛</option>
-                  <option value="sunset">노을빛</option>
-                  <option value="citrus">햇살빛</option>
-                  <option value="berry">베리빛</option>
-                </select>
-              </label>
-            </div>
-          </div>
-        </details>
-
-        <div class="preset-row" aria-label="빠른 습관 예시">
-          <button type="button" class="preset-chip" data-emoji="💧" data-name="물 2리터 마시기" data-note="몸이 가벼워지는 기본 루틴" data-color="mint">💧 수분</button>
-          <button type="button" class="preset-chip" data-emoji="📚" data-name="20분 책 읽기" data-note="짧아도 매일 읽는 시간" data-color="berry">📚 독서</button>
-          <button type="button" class="preset-chip" data-emoji="🧘" data-name="5분 스트레칭" data-note="몸을 부드럽게 깨우는 시작" data-color="sunset">🧘 스트레칭</button>
-          <button type="button" class="preset-chip" data-emoji="🌙" data-name="자기 전 일기 쓰기" data-note="하루를 조용히 정리하는 시간" data-color="citrus">🌙 일기</button>
-        </div>
       </section>
 
       <section class="week-card" aria-labelledby="weekTitle">

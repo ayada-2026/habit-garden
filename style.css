@@ -546,9 +546,9 @@ select:focus {
 
 .habit-form {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 96px 144px;
+  grid-template-columns: 1fr;
   gap: 12px;
-  align-items: end;
+  align-items: start;
 }
 
 .field {
@@ -563,6 +563,10 @@ select:focus {
 
 .field-emoji input {
   display: none;
+}
+
+.field-emoji {
+  max-width: 132px;
 }
 
 .emoji-picker {
@@ -605,7 +609,7 @@ select:focus {
 
 .emoji-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
   margin-top: 10px;
   padding: 12px;
@@ -653,7 +657,7 @@ select:focus {
 }
 
 .detail-panel {
-  margin-top: 14px;
+  margin-top: -2px;
 }
 
 .detail-toggle {
@@ -684,24 +688,6 @@ select:focus {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(190px, 0.8fr);
   gap: 12px;
-}
-
-.preset-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 16px;
-}
-
-.preset-chip {
-  min-height: 34px;
-  padding: 0 11px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.84);
-  border: 1px solid rgba(136, 118, 92, 0.08);
-  color: var(--muted);
-  box-shadow: none;
-  font-size: 0.86rem;
 }
 
 .week-overview {
@@ -784,7 +770,6 @@ select:focus {
     grid-template-columns: 1fr;
   }
 
-  .habit-form,
   .detail-grid {
     grid-template-columns: 1fr;
   }
@@ -901,23 +886,23 @@ select:focus {
   }
 
   .habit-form {
-    grid-template-columns: minmax(0, 1fr) 84px;
+    grid-template-columns: 1fr;
   }
 
   .field-name {
-    grid-column: 1 / -1;
+    grid-column: auto;
   }
 
   .form-submit {
-    grid-column: 1 / -1;
+    grid-column: auto;
   }
 
   .field-emoji {
-    grid-column: 1 / -1;
+    max-width: 124px;
   }
 
   .emoji-grid {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .habit-title {
