@@ -566,12 +566,13 @@ select:focus {
 }
 
 .field-emoji {
-  width: 168px;
-  max-width: 100%;
+  width: 100%;
+  max-width: none;
 }
 
 .emoji-picker {
   position: relative;
+  width: 100%;
 }
 
 .emoji-trigger {
@@ -612,7 +613,8 @@ select:focus {
 
 .emoji-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: 100%;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 8px;
   margin-top: 10px;
   padding: 12px;
@@ -623,11 +625,11 @@ select:focus {
 }
 
 .emoji-option {
-  min-height: 40px;
+  min-height: 38px;
   border-radius: 14px;
   background: rgba(247, 250, 247, 0.96);
   border: 1px solid rgba(136, 118, 92, 0.08);
-  font-size: 1.05rem;
+  font-size: 1rem;
 }
 
 .emoji-option.is-selected {
@@ -901,12 +903,12 @@ select:focus {
   }
 
   .field-emoji {
-    width: 168px;
-    max-width: 100%;
+    width: 100%;
+    max-width: none;
   }
 
   .emoji-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 
   .habit-title {
