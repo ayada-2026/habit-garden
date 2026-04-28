@@ -1,9 +1,11 @@
+const STORAGE_KEY = "habitGardenHomeV1";
+
 const ASSETS = {
   potSprout: "./assets/illustrations/pot-sprout.svg",
   leafOrnament: "./assets/illustrations/leaf-ornament.svg",
 };
 
-const state = {
+const DEFAULT_STATE = {
   hero: {
     eyebrow: "Habit Garden",
     title: "작은 습관 정원",
@@ -12,8 +14,6 @@ const state = {
   status: {
     date: "2026년 4월 28일 화요일",
     kicker: "오늘의 정원",
-    title: "첫 물주기 전",
-    text: "가장 쉬운 습관부터 시작해요.",
   },
   habits: [
     {
@@ -46,12 +46,57 @@ const state = {
   ],
 };
 
+const EMOJI_OPTIONS = ["🌿", "💧", "📖", "🧘", "🌙", "🎸", "🏃", "🍎", "☀️", "🪴"];
+const COLOR_OPTIONS = [
+  { value: "mint", label: "민트빛" },
+  { value: "sunset", label: "노을빛" },
+  { value: "citrus", label: "햇살빛" },
+  { value: "berry", label: "베리빛" },
+];
+
 const roots = {
   headerHero: document.querySelector("#headerHero"),
   gardenStatus: document.querySelector("#gardenStatus"),
   habitSectionHeader: document.querySelector("#habitSectionHeader"),
   habitList: document.querySelector("#habitList"),
+  composerSection: document.querySelector("#composerSection"),
 };
+
+let state = loadState();
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return structuredClone(DEFAULT_STATE);
+    const parsed = JSON.parse(raw);
+    return {
+      hero: parsed.hero ?? structuredClone(DEFAULT_STATE.hero),
+      status: parsed.status ?? structuredClone(DEFAULT_STATE.status),
+      habits: Array.isArray(parsed.habits) && parsed.habits.length
+        ? parsed.habits.map(normalizeHabit)
+        : structuredClone(DEFAULT_STATE.habits),
+    };
+  } catch (error) {
+    console.error("Failed to load state", error);
+    return structuredClone(DEFAULT_STATE);
+  }
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function normalizeHabit(habit) {
+  return {
+    id: typeof habit.id === "string" ? habit.id : `${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
+    icon: typeof habit.icon === "string" && habit.icon.trim() ? habit.icon.trim() : "🌿",
+    title: typeof habit.title === "string" ? habit.title.trim() : "",
+    text: typeof habit.text === "string" && habit.text.trim() ? habit.text.trim() : "작게 시작해도 충분해요.",
+    streak: Number.isFinite(habit.streak) ? habit.streak : 0,
+    weeklyCount: Number.isFinite(habit.weeklyCount) ? habit.weeklyCount : 0,
+    recordedToday: Boolean(habit.recordedToday),
+  };
+}
 
 function escapeHtml(value) {
   return String(value)
@@ -66,7 +111,7 @@ function getStatusSummary() {
   const doneToday = state.habits.filter((habit) => habit.recordedToday).length;
   const bestStreak = state.habits.reduce((max, habit) => Math.max(max, habit.streak), 0);
   const weeklyChecks = state.habits.reduce((sum, habit) => sum + habit.weeklyCount, 0);
-  const weeklyGoal = state.habits.length * 7;
+  const weeklyGoal = Math.max(1, state.habits.length * 7);
   const weeklyRate = Math.round((weeklyChecks / weeklyGoal) * 100);
 
   return [
@@ -194,7 +239,12 @@ function HabitCard(habit) {
               <h3 class="habit-title">${escapeHtml(habit.title)}</h3>
               <p class="habit-text">${escapeHtml(habit.text)}</p>
             </div>
-            <button type="button" class="habit-menu" data-action="menu" aria-label="${escapeHtml(habit.title)} 메뉴">⋯</button>
+            <details class="habit-menu-shell">
+              <summary class="habit-menu" aria-label="${escapeHtml(habit.title)} 메뉴">⋯</summary>
+              <div class="habit-menu-popover">
+                <button type="button" class="habit-menu-item" data-action="delete" data-id="${escapeHtml(habit.id)}">삭제</button>
+              </div>
+            </details>
           </div>
 
           <div class="habit-bottom">
@@ -214,21 +264,105 @@ function HabitCard(habit) {
   `;
 }
 
+function ComposerSection() {
+  return `
+    <details class="composer-card" id="composerCard">
+      <summary class="composer-summary">
+        <div>
+          <p class="section-eyebrow">New Habit</p>
+          <h2 class="composer-title" id="composerSectionTitle">새 습관 심기</h2>
+          <p class="composer-text">작은 습관 하나를 더 심어볼까요?</p>
+        </div>
+        <span class="composer-toggle" aria-hidden="true"></span>
+      </summary>
+
+      <form class="composer-form" id="composerForm">
+        <label class="composer-field">
+          <span class="composer-label">습관 이름</span>
+          <input class="composer-input" id="habitNameInput" name="title" type="text" maxlength="28" placeholder="예: 물 2리터 마시기" required>
+        </label>
+
+        <label class="composer-field">
+          <span class="composer-label">아이콘</span>
+          <div class="emoji-row" id="emojiRow">
+            ${EMOJI_OPTIONS.map((emoji, index) => `
+              <button
+                type="button"
+                class="emoji-pill${index === 0 ? " is-selected" : ""}"
+                data-action="pick-emoji"
+                data-emoji="${emoji}"
+              >${emoji}</button>
+            `).join("")}
+          </div>
+        </label>
+
+        <details class="composer-detail" id="composerDetail">
+          <summary class="composer-detail-toggle">+ 메모와 색 더하기</summary>
+          <div class="composer-detail-body">
+            <label class="composer-field">
+              <span class="composer-label">짧은 설명</span>
+              <input class="composer-input" id="habitTextInput" name="text" type="text" maxlength="48" placeholder="작게 시작해도 충분해요.">
+            </label>
+
+            <label class="composer-field">
+              <span class="composer-label">분위기 색</span>
+              <select class="composer-select" id="habitColorInput" name="color">
+                ${COLOR_OPTIONS.map((option) => `
+                  <option value="${option.value}">${escapeHtml(option.label)}</option>
+                `).join("")}
+              </select>
+            </label>
+          </div>
+        </details>
+
+        <input id="habitEmojiInput" name="icon" type="hidden" value="🌿">
+
+        <button type="submit" class="composer-submit">습관 추가</button>
+      </form>
+    </details>
+  `;
+}
+
 function toggleHabitRecord(id) {
   state.habits = state.habits.map((habit) => {
     if (habit.id !== id) return habit;
 
-    const nextRecorded = !habit.recordedToday;
-    const nextWeekly = nextRecorded ? habit.weeklyCount + 1 : Math.max(0, habit.weeklyCount - 1);
-    const nextStreak = nextRecorded ? Math.max(1, habit.streak + (habit.streak > 0 ? 0 : 0)) : Math.max(0, habit.streak - 1);
-
+    const nextRecordedToday = !habit.recordedToday;
     return {
       ...habit,
-      recordedToday: nextRecorded,
-      weeklyCount: nextWeekly,
-      streak: nextRecorded ? Math.max(1, habit.streak) : nextStreak,
+      recordedToday: nextRecordedToday,
+      weeklyCount: nextRecordedToday ? habit.weeklyCount + 1 : Math.max(0, habit.weeklyCount - 1),
+      streak: nextRecordedToday ? habit.streak + 1 : Math.max(0, habit.streak - 1),
     };
   });
+  saveState();
+}
+
+function deleteHabit(id) {
+  state.habits = state.habits.filter((habit) => habit.id !== id);
+  saveState();
+}
+
+function addHabit(form) {
+  const title = form.get("title")?.trim();
+  if (!title) return;
+
+  const icon = form.get("icon")?.trim() || "🌿";
+  const text = form.get("text")?.trim() || "작게 시작해도 충분해요.";
+
+  state.habits = [
+    ...state.habits,
+    {
+      id: `${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
+      icon,
+      title,
+      text,
+      streak: 0,
+      weeklyCount: 0,
+      recordedToday: false,
+    },
+  ];
+  saveState();
 }
 
 function renderHome() {
@@ -240,6 +374,7 @@ function renderHome() {
     text: "필요한 카드부터 시작해보세요.",
   });
   roots.habitList.innerHTML = state.habits.map(HabitCard).join("");
+  roots.composerSection.innerHTML = ComposerSection();
 }
 
 document.addEventListener("click", (event) => {
@@ -247,14 +382,53 @@ document.addEventListener("click", (event) => {
   if (!target) return;
 
   const action = target.dataset.action;
+
   if (action === "record") {
     toggleHabitRecord(target.dataset.id);
     renderHome();
+    return;
   }
 
-  if (action === "menu") {
-    window.alert("세부 메뉴는 다음 단계에서 연결할 수 있어요.");
+  if (action === "delete") {
+    const habit = state.habits.find((item) => item.id === target.dataset.id);
+    const confirmed = window.confirm(`"${habit?.title ?? "이 습관"}"을 삭제할까요?`);
+    if (!confirmed) return;
+    deleteHabit(target.dataset.id);
+    renderHome();
+    return;
   }
+
+  if (action === "pick-emoji") {
+    const input = document.querySelector("#habitEmojiInput");
+    const row = document.querySelector("#emojiRow");
+    if (!input || !row) return;
+    input.value = target.dataset.emoji;
+    row.querySelectorAll(".emoji-pill").forEach((pill) => {
+      pill.classList.toggle("is-selected", pill === target);
+    });
+  }
+});
+
+document.addEventListener("submit", (event) => {
+  if (event.target.id !== "composerForm") return;
+
+  event.preventDefault();
+  const form = new FormData(event.target);
+  addHabit(form);
+  renderHome();
+
+  const composerCard = document.querySelector("#composerCard");
+  if (composerCard) {
+    composerCard.removeAttribute("open");
+  }
+});
+
+document.addEventListener("click", (event) => {
+  document.querySelectorAll(".habit-menu-shell[open]").forEach((menu) => {
+    if (!menu.contains(event.target)) {
+      menu.removeAttribute("open");
+    }
+  });
 });
 
 renderHome();
