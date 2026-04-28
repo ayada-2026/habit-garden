@@ -1,4 +1,4 @@
-const STORAGE_KEY = "habitGardenHomeV1";
+const STORAGE_KEY = "habitGardenV2State";
 
 const ASSETS = {
   potSprout: "./assets/illustrations/pot-sprout.svg",
@@ -55,30 +55,37 @@ const COLOR_OPTIONS = [
 ];
 
 const roots = {
-  headerHero: document.querySelector("#headerHero"),
-  gardenStatus: document.querySelector("#gardenStatus"),
-  habitSectionHeader: document.querySelector("#habitSectionHeader"),
-  habitList: document.querySelector("#habitList"),
-  composerSection: document.querySelector("#composerSection"),
+  heroMount: document.querySelector("#heroMount"),
+  statusMount: document.querySelector("#statusMount"),
+  habitHeaderMount: document.querySelector("#habitHeaderMount"),
+  habitListMount: document.querySelector("#habitListMount"),
+  composerMount: document.querySelector("#composerMount"),
 };
 
 let state = loadState();
 
+function cloneDefaultState() {
+  return JSON.parse(JSON.stringify(DEFAULT_STATE));
+}
+
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return structuredClone(DEFAULT_STATE);
+    if (!raw) {
+      return cloneDefaultState();
+    }
+
     const parsed = JSON.parse(raw);
     return {
-      hero: parsed.hero ?? structuredClone(DEFAULT_STATE.hero),
-      status: parsed.status ?? structuredClone(DEFAULT_STATE.status),
+      hero: parsed.hero ?? cloneDefaultState().hero,
+      status: parsed.status ?? cloneDefaultState().status,
       habits: Array.isArray(parsed.habits) && parsed.habits.length
         ? parsed.habits.map(normalizeHabit)
-        : structuredClone(DEFAULT_STATE.habits),
+        : cloneDefaultState().habits,
     };
   } catch (error) {
-    console.error("Failed to load state", error);
-    return structuredClone(DEFAULT_STATE);
+    console.error("Failed to load Habit Garden v2 state", error);
+    return cloneDefaultState();
   }
 }
 
@@ -90,10 +97,10 @@ function normalizeHabit(habit) {
   return {
     id: typeof habit.id === "string" ? habit.id : `${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
     icon: typeof habit.icon === "string" && habit.icon.trim() ? habit.icon.trim() : "🌿",
-    title: typeof habit.title === "string" ? habit.title.trim() : "",
+    title: typeof habit.title === "string" && habit.title.trim() ? habit.title.trim() : "새 습관",
     text: typeof habit.text === "string" && habit.text.trim() ? habit.text.trim() : "작게 시작해도 충분해요.",
-    streak: Number.isFinite(habit.streak) ? habit.streak : 0,
-    weeklyCount: Number.isFinite(habit.weeklyCount) ? habit.weeklyCount : 0,
+    streak: Number.isFinite(habit.streak) ? Math.max(0, habit.streak) : 0,
+    weeklyCount: Number.isFinite(habit.weeklyCount) ? Math.max(0, habit.weeklyCount) : 0,
     recordedToday: Boolean(habit.recordedToday),
   };
 }
@@ -199,7 +206,6 @@ function GardenStatusCard(status) {
           </div>
           <p class="status-text">${escapeHtml(headline.text)}</p>
         </div>
-
         <div class="status-ring" aria-hidden="true">
           <img class="status-illustration" src="${ASSETS.potSprout}" alt="">
         </div>
@@ -240,7 +246,7 @@ function HabitCard(habit) {
               <p class="habit-text">${escapeHtml(habit.text)}</p>
             </div>
             <details class="habit-menu-shell">
-              <summary class="habit-menu" aria-label="${escapeHtml(habit.title)} 메뉴">⋯</summary>
+              <summary class="habit-menu" aria-label="${escapeHtml(habit.title)} 메뉴">···</summary>
               <div class="habit-menu-popover">
                 <button type="button" class="habit-menu-item" data-action="delete" data-id="${escapeHtml(habit.id)}">삭제</button>
               </div>
@@ -259,6 +265,18 @@ function HabitCard(habit) {
             </button>
           </div>
         </div>
+      </div>
+    </article>
+  `;
+}
+
+function EmptyHabitCard() {
+  return `
+    <article class="habit-card habit-card-empty">
+      <div class="empty-copy">
+        <p class="empty-kicker">첫 습관</p>
+        <h3 class="empty-title">작은 습관 하나를 심어보세요</h3>
+        <p class="empty-text">아래 새 습관 심기에서 이름 하나만 적어도 정원이 바로 시작돼요.</p>
       </div>
     </article>
   `;
@@ -286,12 +304,7 @@ function ComposerSection() {
           <span class="composer-label">아이콘</span>
           <div class="emoji-row" id="emojiRow">
             ${EMOJI_OPTIONS.map((emoji, index) => `
-              <button
-                type="button"
-                class="emoji-pill${index === 0 ? " is-selected" : ""}"
-                data-action="pick-emoji"
-                data-emoji="${emoji}"
-              >${emoji}</button>
+              <button type="button" class="emoji-pill${index === 0 ? " is-selected" : ""}" data-action="pick-emoji" data-emoji="${emoji}">${emoji}</button>
             `).join("")}
           </div>
         </label>
@@ -307,9 +320,7 @@ function ComposerSection() {
             <label class="composer-field">
               <span class="composer-label">분위기 색</span>
               <select class="composer-select" id="habitColorInput" name="color">
-                ${COLOR_OPTIONS.map((option) => `
-                  <option value="${option.value}">${escapeHtml(option.label)}</option>
-                `).join("")}
+                ${COLOR_OPTIONS.map((option) => `<option value="${option.value}">${escapeHtml(option.label)}</option>`).join("")}
               </select>
             </label>
           </div>
@@ -325,7 +336,9 @@ function ComposerSection() {
 
 function toggleHabitRecord(id) {
   state.habits = state.habits.map((habit) => {
-    if (habit.id !== id) return habit;
+    if (habit.id !== id) {
+      return habit;
+    }
 
     const nextRecordedToday = !habit.recordedToday;
     return {
@@ -335,6 +348,7 @@ function toggleHabitRecord(id) {
       streak: nextRecordedToday ? habit.streak + 1 : Math.max(0, habit.streak - 1),
     };
   });
+
   saveState();
 }
 
@@ -343,43 +357,52 @@ function deleteHabit(id) {
   saveState();
 }
 
-function addHabit(form) {
-  const title = form.get("title")?.trim();
-  if (!title) return;
-
-  const icon = form.get("icon")?.trim() || "🌿";
-  const text = form.get("text")?.trim() || "작게 시작해도 충분해요.";
+function addHabit(formData) {
+  const title = formData.get("title")?.trim();
+  if (!title) {
+    return;
+  }
 
   state.habits = [
     ...state.habits,
     {
       id: `${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
-      icon,
+      icon: formData.get("icon")?.trim() || "🌿",
       title,
-      text,
+      text: formData.get("text")?.trim() || "작게 시작해도 충분해요.",
       streak: 0,
       weeklyCount: 0,
       recordedToday: false,
     },
   ];
+
   saveState();
 }
 
 function renderHome() {
-  roots.headerHero.innerHTML = HeaderHero(state.hero);
-  roots.gardenStatus.innerHTML = GardenStatusCard(state.status);
-  roots.habitSectionHeader.innerHTML = SectionHeader({
+  roots.heroMount.innerHTML = HeaderHero(state.hero);
+  roots.statusMount.innerHTML = GardenStatusCard(state.status);
+  roots.habitHeaderMount.innerHTML = SectionHeader({
     eyebrow: "Garden Cards",
     title: "오늘 돌볼 습관",
     text: "필요한 카드부터 시작해보세요.",
   });
-  roots.habitList.innerHTML = state.habits.map(HabitCard).join("");
-  roots.composerSection.innerHTML = ComposerSection();
+  roots.habitListMount.innerHTML = state.habits.length
+    ? state.habits.map(HabitCard).join("")
+    : EmptyHabitCard();
+  roots.composerMount.innerHTML = ComposerSection();
 }
 
 document.addEventListener("click", (event) => {
   const target = event.target.closest("[data-action]");
-  if (!target) return;
+  if (!target) {
+    document.querySelectorAll(".habit-menu-shell[open]").forEach((menu) => {
+      if (!menu.contains(event.target)) {
+        menu.removeAttribute("open");
+      }
+    });
+    return;
+  }
 
   const action = target.dataset.action;
 
@@ -392,7 +415,9 @@ document.addEventListener("click", (event) => {
   if (action === "delete") {
     const habit = state.habits.find((item) => item.id === target.dataset.id);
     const confirmed = window.confirm(`"${habit?.title ?? "이 습관"}"을 삭제할까요?`);
-    if (!confirmed) return;
+    if (!confirmed) {
+      return;
+    }
     deleteHabit(target.dataset.id);
     renderHome();
     return;
@@ -401,7 +426,9 @@ document.addEventListener("click", (event) => {
   if (action === "pick-emoji") {
     const input = document.querySelector("#habitEmojiInput");
     const row = document.querySelector("#emojiRow");
-    if (!input || !row) return;
+    if (!input || !row) {
+      return;
+    }
     input.value = target.dataset.emoji;
     row.querySelectorAll(".emoji-pill").forEach((pill) => {
       pill.classList.toggle("is-selected", pill === target);
@@ -410,25 +437,18 @@ document.addEventListener("click", (event) => {
 });
 
 document.addEventListener("submit", (event) => {
-  if (event.target.id !== "composerForm") return;
+  if (event.target.id !== "composerForm") {
+    return;
+  }
 
   event.preventDefault();
-  const form = new FormData(event.target);
-  addHabit(form);
+  addHabit(new FormData(event.target));
   renderHome();
 
   const composerCard = document.querySelector("#composerCard");
   if (composerCard) {
     composerCard.removeAttribute("open");
   }
-});
-
-document.addEventListener("click", (event) => {
-  document.querySelectorAll(".habit-menu-shell[open]").forEach((menu) => {
-    if (!menu.contains(event.target)) {
-      menu.removeAttribute("open");
-    }
-  });
 });
 
 renderHome();
