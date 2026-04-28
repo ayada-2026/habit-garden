@@ -1,0 +1,49 @@
+<svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="potGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(160 250) rotate(90) scale(60 90)">
+      <stop offset="0" stop-color="#DDECDC" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#DDECDC" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="potFill" x1="102" y1="135" x2="220" y2="255" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7ECDC"/>
+      <stop offset="1" stop-color="#EEDFC9"/>
+    </linearGradient>
+    <linearGradient id="rimFill" x1="111" y1="125" x2="212" y2="148" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F3E6D6"/>
+      <stop offset="1" stop-color="#E5D4BE"/>
+    </linearGradient>
+    <linearGradient id="soilFill" x1="123" y1="138" x2="201" y2="138" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8E6B43"/>
+      <stop offset="1" stop-color="#A47A4F"/>
+    </linearGradient>
+    <linearGradient id="stemFill" x1="158" y1="123" x2="176" y2="188" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A8C980"/>
+      <stop offset="1" stop-color="#89AB65"/>
+    </linearGradient>
+    <linearGradient id="leafSoft" x1="121" y1="92" x2="210" y2="162" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E3EAB9"/>
+      <stop offset="1" stop-color="#C5D68D"/>
+    </linearGradient>
+  </defs>
+
+  <ellipse cx="160" cy="252" rx="86" ry="34" fill="url(#potGlow)"/>
+  <ellipse cx="159.5" cy="251.5" rx="65.5" ry="18.5" fill="#D9E7D4" opacity="0.35"/>
+
+  <path d="M111 133C111 111.461 128.461 94 150 94H170C191.539 94 209 111.461 209 133V196C209 230.346 181.346 258 147 258H173C207.346 258 235 230.346 235 196V133C235 111.461 217.539 94 196 94H150C128.461 94 111 111.461 111 133Z" fill="#F5EADC" opacity="0.15"/>
+  <path d="M99 168C99 126.026 133.026 92 175 92H177C218.974 92 253 126.026 253 168V208C253 242.242 225.242 270 191 270H161C126.758 270 99 242.242 99 208V168Z" fill="url(#potFill)"/>
+  <path d="M99 168C99 126.026 133.026 92 175 92H177C218.974 92 253 126.026 253 168V208C253 242.242 225.242 270 191 270H161C126.758 270 99 242.242 99 208V168Z" stroke="#E7D7C2" stroke-width="2"/>
+  <ellipse cx="176" cy="141" rx="67" ry="22" fill="url(#rimFill)"/>
+  <ellipse cx="176" cy="141" rx="50" ry="14" fill="url(#soilFill)"/>
+  <path d="M170 142C170 135.373 175.373 130 182 130V130C188.627 130 194 135.373 194 142V186C194 192.627 188.627 198 182 198V198C175.373 198 170 192.627 170 186V142Z" fill="url(#stemFill)"/>
+
+  <path d="M171 144C145.496 129.912 117.335 125.791 95 129.786C100.683 157.282 120.554 177.615 148.52 184.057C162.967 173.119 170.581 159.727 171 144Z" fill="url(#leafSoft)"/>
+  <path d="M171 144C145.496 129.912 117.335 125.791 95 129.786C100.683 157.282 120.554 177.615 148.52 184.057C162.967 173.119 170.581 159.727 171 144Z" stroke="#B2C382" stroke-width="2"/>
+  <path d="M183 136C199.254 115.417 224.338 100.834 254 97C254.589 127.934 239.968 156.417 214.513 175.791C193.562 168.844 183.35 156.247 183 136Z" fill="url(#leafSoft)"/>
+  <path d="M183 136C199.254 115.417 224.338 100.834 254 97C254.589 127.934 239.968 156.417 214.513 175.791C193.562 168.844 183.35 156.247 183 136Z" stroke="#B2C382" stroke-width="2"/>
+  <path d="M182 110C171.398 96.8791 156.702 88.6933 142 87C140.915 102.097 147.139 116.965 160.713 128.505C171.886 124.46 179.574 118.292 182 110Z" fill="url(#leafSoft)"/>
+  <path d="M182 110C171.398 96.8791 156.702 88.6933 142 87C140.915 102.097 147.139 116.965 160.713 128.505C171.886 124.46 179.574 118.292 182 110Z" stroke="#B2C382" stroke-width="2"/>
+
+  <path d="M139 139C147.43 146.713 154.137 156.595 158 168" stroke="#A1B76B" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+  <path d="M214 113C201.766 126.135 193.522 141.103 190 158" stroke="#A1B76B" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+  <path d="M161 94C167.753 104.432 171.012 114.732 170.778 125" stroke="#A1B76B" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+</svg>

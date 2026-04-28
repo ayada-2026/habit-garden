@@ -1,0 +1,21 @@
+<svg width="220" height="220" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="leafTone" x1="51" y1="24" x2="170" y2="190" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D9E5B6"/>
+      <stop offset="1" stop-color="#B7C98A"/>
+    </linearGradient>
+  </defs>
+  <g opacity="0.88">
+    <path d="M53 191C90 155 114 127 131 89C141 68 144 49 144 28" stroke="#B9C78D" stroke-width="10" stroke-linecap="round"/>
+    <path d="M126 84C108 58 84 44 56 39C58 68 76 90 106 100C117 96 124 91 126 84Z" fill="url(#leafTone)"/>
+    <path d="M126 84C108 58 84 44 56 39C58 68 76 90 106 100C117 96 124 91 126 84Z" stroke="#C7D29E" stroke-width="2"/>
+    <path d="M127 88C150 67 178 58 206 60C198 87 177 108 146 115C136 108 130 99 127 88Z" fill="url(#leafTone)"/>
+    <path d="M127 88C150 67 178 58 206 60C198 87 177 108 146 115C136 108 130 99 127 88Z" stroke="#C7D29E" stroke-width="2"/>
+    <path d="M97 132C79 117 58 110 35 110C40 131 54 147 76 154C86 150 93 143 97 132Z" fill="url(#leafTone)"/>
+    <path d="M97 132C79 117 58 110 35 110C40 131 54 147 76 154C86 150 93 143 97 132Z" stroke="#C7D29E" stroke-width="2"/>
+    <path d="M101 138C122 120 146 113 171 116C165 137 149 154 123 162C112 158 105 150 101 138Z" fill="url(#leafTone)"/>
+    <path d="M101 138C122 120 146 113 171 116C165 137 149 154 123 162C112 158 105 150 101 138Z" stroke="#C7D29E" stroke-width="2"/>
+    <path d="M71 172C58 161 43 155 26 154C30 168 41 181 58 188C65 185 70 180 71 172Z" fill="url(#leafTone)"/>
+    <path d="M71 172C58 161 43 155 26 154C30 168 41 181 58 188C65 185 70 180 71 172Z" stroke="#C7D29E" stroke-width="2"/>
+  </g>
+</svg>
